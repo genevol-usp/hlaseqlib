@@ -32,7 +32,7 @@ hla_infer <- function(hla_df, cores = 1) {
     dplyr::mutate(inferred_seq = purrr::map2_chr(cds.x, cds.y, hla_attribute_seq)) %>%
     dplyr::select(locus, allele, cds = inferred_seq),
   mc.cores = cores) %>%
-  dplyr::bind_rows(.id = "allele") %>%
+  dplyr::bind_rows() %>%
   dplyr::distinct() %>%
   dplyr::select(locus, allele = allele_id, cds) %>%
   dplyr::bind_rows(complete_df, .)
