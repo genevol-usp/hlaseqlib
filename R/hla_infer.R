@@ -34,7 +34,7 @@ hla_infer <- function(hla_df, cores = 1) {
   mc.cores = cores) %>%
   dplyr::bind_rows() %>%
   dplyr::distinct() %>%
-  dplyr::select(locus, allele = allele_id, cds) %>%
+  dplyr::select(locus, allele, cds) %>%
   dplyr::bind_rows(complete_df, .)
 }
 
