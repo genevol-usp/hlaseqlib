@@ -4,11 +4,15 @@ Version: 0.0.0.9000
 Authors@R: person("Vitor", "Aguiar", , "vitor@ib.usp.br", c("aut", "cre"))
 Description: Utils package for the HLA RNAseq project
 Depends:
-    R (>= 3.2.1)
+    R (>= 3.4)
 Imports:
     data.table,
+    dplyr,
     magrittr,
-    tidyverse
+    purrr,
+    stringr,
+    tibble,
+    tidyr
 Suggests: 
 License: MIT + file LICENSE
 LazyData: yes
