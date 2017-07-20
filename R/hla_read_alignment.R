@@ -24,7 +24,7 @@ hla_read_alignment <- function(nuc_file, exons = NULL, by_exon = FALSE,
     readLines(nuc_file) %>%
     gsub("\\s{2,}", " ", .) %>%
     trimws %>%
-    .[grepl(paste0("^", locus, "\\d?\\*"), .)]
+    .[grepl(sprintf("^%s\\d?\\*\\d{2,3}[:A-Z0-9]*\\s", locus), .)]
 
   hla_df <-
     tibble::tibble(allele = gsub("^(\\S+)\\s(.*)$", "\\1", nuc),
@@ -46,7 +46,10 @@ hla_read_alignment <- function(nuc_file, exons = NULL, by_exon = FALSE,
     hla_df <- dplyr::filter(hla_df, grepl(suffix, allele))
   }
 
-  if (rm_incomplete) hla_df <- dplyr::filter(hla_df, !grepl("\\*", cds))
+  if (rm_incomplete) {
+    hla_df <- dplyr::filter(hla_df, !grepl("\\*", cds))
+    if (nrow(hla_df) == 0) return(hla_df)
+  }
   
   if (keep_sep && is.null(exons)) return(hla_df)
 
@@ -59,7 +62,7 @@ hla_read_alignment <- function(nuc_file, exons = NULL, by_exon = FALSE,
     dplyr::select(allele, exon, cds) 
 
   if (!is.null(exons) && is.numeric(exons)) {
-    hla_df %<>% dplyr::filter(exon %in% exons)
+    hla_df <- dplyr::filter(hla_df, exon %in% exons)
   }
 
   if (by_exon) {
