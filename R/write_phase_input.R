@@ -32,7 +32,7 @@ write_phase_input <- function(genotypes, outfile) {
     dplyr::select(locus, allele, code) %>% 
     dplyr::arrange(locus, code) %>%
     dplyr::distinct() %>%
-    readr::write_tsv(stringr::str_c("codes-", outfile))
+    readr::write_tsv(paste0("codes-", outfile))
 
   haps_recoded <-
     genotypes_recoded %>%
