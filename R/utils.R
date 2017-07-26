@@ -108,6 +108,20 @@ find_closest_allele <- function(incomplete, complete_df) {
   names()
 }
 
+hla_make_sequences <- function(l, infer_incomplete, n_cores) {
+
+  paste0("/home/vitor/IMGTHLA/alignments/", l, "_nuc.txt") %>%
+  hla_read_alignment(omit = "N", rm_incomplete = !infer_incomplete) %>%
+  dplyr::mutate(locus = sub("^([^*]+).+$", "\\1", allele)) %>%
+  dplyr::select(locus, allele, cds) %>%
+  dplyr::group_by(locus) %>%
+  dplyr::filter(!all(grepl("\\*", cds))) %>%
+  dplyr::ungroup() %>%
+  split(.$locus) %>%
+  purrr::map_df(~hla_infer(., cores = n_cores)) %>%
+  dplyr::select(-locus)
+}
+
 hla_format_sequence <- function(cds) {
 
   cds %>%

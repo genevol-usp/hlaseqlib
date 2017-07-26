@@ -1,4 +1,4 @@
-devtools::load_all("../")
+devtools::load_all(".")
 library(tidyverse)
 
 translate_allele <- function(allele) {
@@ -59,27 +59,27 @@ geuvadis_info <-
   mutate(kgp_phase3 = as.integer(name %in% samples_phase3$subject)) 
 
 gencode_chr_gene <-
-  "~/gencode_data/gencode.v26.annotation.gtf.gz" %>%
+  "~/gencode_data/gencode.v25.annotation.gtf.gz" %>%
   get_gencode_coords(feature = "gene")
 
 gencode_chr_tx <-
-  "~/gencode_data/gencode.v26.annotation.gtf.gz" %>%
+  "~/gencode_data/gencode.v25.annotation.gtf.gz" %>%
   get_gencode_coords(feature = "transcript")
 
 gencode_pri_gene <-
-  "~/gencode_data/gencode.v26.primary_assembly.annotation.gtf.gz" %>%
+  "~/gencode_data/gencode.v25.primary_assembly.annotation.gtf.gz" %>%
   get_gencode_coords(feature = "gene")
 
 gencode_pri_tx <-
-  "~/gencode_data/gencode.v26.primary_assembly.annotation.gtf.gz" %>%
+  "~/gencode_data/gencode.v25.primary_assembly.annotation.gtf.gz" %>%
   get_gencode_coords(feature = "transcript")
 
 gencode_all_gene <-
-  "~/gencode_data/gencode.v26.chr_patch_hapl_scaff.annotation.gtf.gz" %>%
+  "~/gencode_data/gencode.v25.chr_patch_hapl_scaff.annotation.gtf.gz" %>%
   get_gencode_coords(feature = "gene")
 
 gencode_all_tx <-
-  "~/gencode_data/gencode.v26.chr_patch_hapl_scaff.annotation.gtf.gz" %>%
+  "~/gencode_data/gencode.v25.chr_patch_hapl_scaff.annotation.gtf.gz" %>%
   get_gencode_coords(feature = "transcript")
 
 hla_groups <-

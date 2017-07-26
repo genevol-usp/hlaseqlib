@@ -11,7 +11,8 @@ get_gencode_coords <- function(gtf, feature = c("gene", "transcript", "exon")) {
   feature <- match.arg(feature)
 
   annot <-
-    readr::read_tsv(gtf, comment = "##", col_names = FALSE, col_types = "c-cii-c-c") %>%
+    readr::read_tsv(gtf, comment = "##", col_names = FALSE, 
+		    col_types = "c-cii-c-c", progress = FALSE) %>%
     dplyr::filter(X3 == feature) %>%
     dplyr::select(chr = X1, start = X4, end = X5, strand = X7, X9) %>%
     dplyr::mutate(i = seq_len(nrow(.)), X9 = stringr::str_split(X9, "; ")) %>%
