@@ -10,6 +10,8 @@
 
 phase_hla <- function(x) {
 
+  x <- dplyr::mutate(x, locus = sub("^HLA-", "", locus))
+
   het_loci <-
     x %>%
       dplyr::group_by(locus) %>%
@@ -40,14 +42,19 @@ phase_hla <- function(x) {
 
   min_hap <- dplyr::select(min_hap, -n)
 
-  if (all(c("a1", "a2") %in% min_hap$hap) & all(x$allele %in% unlist(min_hap))) {
+  if (all(c("a1", "a2") %in% min_hap$hap) && 
+      all(x$allele %in% unlist(min_hap)) && 
+      !any(duplicated(min_hap$hap))) {
      return(min_hap)
   }
 
   amb_loci <- 
-    min_hap[het_loci] %>%
-    purrr::keep(~dplyr::n_distinct(.) > 1) %>%
-    names()
+    min_hap %>%
+    tidyr::gather(locus, allele, -hap, -S) %>%
+    dplyr::group_by(hap, locus) %>%
+    dplyr::filter(dplyr::n_distinct(allele) > 1) %>%
+    dplyr::pull(locus) %>%
+    unique()
 
   min_alleles <- 
     min_hap[het_loci] %>%
