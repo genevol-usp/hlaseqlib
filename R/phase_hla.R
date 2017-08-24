@@ -79,6 +79,12 @@ phase_hla <- function(x) {
 		  ! C %in% amb_in_hap2, ! DQA1 %in% amb_in_hap2, 
 		  ! DQB1 %in% amb_in_hap2, ! DRB1 %in% amb_in_hap2)
 
+  if(all(c("a1", "a2") %in% min_hap$hap) && 
+     !all(c("a1", "a2") %in% sec_hap$hap)) {
+
+    min_hap <- dplyr::filter(min_hap, ! hap %in% sec_hap$hap)
+  }
+
   dplyr::bind_rows(min_hap, sec_hap) %>%
     dplyr::group_by(hap) %>%
     dplyr::summarize_all(. %>% unique %>% paste(collapse = "/")) 
