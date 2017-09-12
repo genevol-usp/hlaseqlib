@@ -19,4 +19,3 @@ includes all alleles.
 Reduce a vector of ambiguous alleles to the maximum resolution that includes
 all of them.
 }
-

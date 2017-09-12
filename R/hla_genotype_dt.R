@@ -1,6 +1,6 @@
 #' Infer HLA genotypes from RNA-seq quantifications.
 #'
-#' @param hla_quants data.frame. Kallisto output data (single or multiple inds).
+#' @param hla_quants data.frame.
 #' @param th numeric. Threshold for expression 2nd/1st allele.
 #'
 #' @return A data.frame

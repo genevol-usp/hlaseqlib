@@ -7,7 +7,7 @@
 hla_genotype_dt(hla_quants, th = 0.05)
 }
 \arguments{
-\item{hla_quants}{data.frame. Kallisto output data (single or multiple inds).}
+\item{hla_quants}{data.frame.}
 
 \item{th}{numeric. Threshold for expression 2nd/1st allele.}
 }

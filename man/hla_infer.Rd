@@ -4,20 +4,18 @@
 \alias{hla_infer}
 \title{Infer sequences missing on the IMGT alignments.}
 \usage{
-hla_infer(hla_df, .parallel = TRUE)
+hla_infer(hla_df, cores = 1)
 }
 \arguments{
 \item{hla_df}{data.frame. A data.frame such as the one returned by 
 \code{hla_dataframe}.}
 
-\item{.parallel}{logical. Whether to run in parallel. If \code{TRUE}, provide
-a parallel backend before calling function.}
+\item{cores}{integer. Number of cores.}
 }
 \value{
 A data.frame with the original sequences of the complete alleles
-plus the inferred sequences for incomplete alleles.
+and the inferred sequences for incomplete alleles.
 }
 \description{
 Infer sequences missing on the IMGT alignments.
 }
-

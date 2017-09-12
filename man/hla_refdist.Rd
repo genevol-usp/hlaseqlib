@@ -22,4 +22,3 @@ allele.
 \description{
 Calculate edit distances to the reference HLA allele.
 }
-

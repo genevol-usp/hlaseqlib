@@ -22,4 +22,3 @@ occurring bases separated by "/".
 of consensus sequences at the resolution specified by the argument
 \code{field}.
 }
-

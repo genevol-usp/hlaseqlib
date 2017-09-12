@@ -22,4 +22,3 @@ all or unique allele names at the digit resolution specified by
 \examples{
 hla_trimnames(c("A*01:01:01:01", "A*02:01:01:01"), fields = 2)
 }
-

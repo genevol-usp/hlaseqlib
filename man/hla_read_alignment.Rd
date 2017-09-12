@@ -18,10 +18,10 @@ hla_read_alignment(nuc_file, exons = NULL, by_exon = FALSE,
 expression status. Possible values are NULL (default, keep all allele names
 with suffixes) or a string of suffixes to omit (e.g., "NQL").}
 
-\item{rm_incomplete}{logical. Whether to remove incomplete sequences.}
+\item{rm_incomplete}{logical. Whether to remove incomplete cdss.}
 
 \item{keep_sep}{logical. Whether to keep the exon separator character "|" in
-the sequences.}
+the cdss.}
 }
 \value{
 A data.frame.
@@ -29,4 +29,3 @@ A data.frame.
 \description{
 Process HLA alignment data in *.nuc files and return a data.frame.
 }
-

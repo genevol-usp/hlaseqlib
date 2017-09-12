@@ -15,4 +15,3 @@ A data.frame.
 \description{
 Read hlaTX output file
 }
-

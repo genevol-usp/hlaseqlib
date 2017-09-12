@@ -4,10 +4,12 @@
 \alias{read_phase}
 \title{Read in PHASE output file}
 \usage{
-read_phase(phase_out)
+read_phase(phase_out, loci)
 }
 \arguments{
 \item{phase_out}{character string. Path to PHASE output file.}
+
+\item{loci}{character string. Loci names in genomic order.}
 }
 \value{
 A data.frame.
