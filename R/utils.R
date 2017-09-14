@@ -129,3 +129,42 @@ hla_format_sequence <- function(cds) {
     gsub("\\*", "N", .)
 }
 
+read_star_imgt_quants <- function(f) {
+
+    read_tsv(f, col_types = "c--dd", progress = FALSE) %>%
+        filter(grepl("^IMGT_", Name)) %>%
+        mutate(locus = imgt_to_gname(Name), gene_id = gname_to_gid(locus)) %>%
+        select(locus, gene_id, allele = Name, est_counts = NumReads, tpm = TPM)
+}
+
+read_star_pri_quants <- function(f) {
+
+    read_tsv(f, col_types = "c--dd", progress = FALSE) %>%
+        left_join(gencode_pri_tx, by = c("Name" = "tx_id")) %>%
+        select(tx_id = Name, locus = gene_name,
+               est_counts = NumReads, tpm = TPM) %>%
+        filter(locus %in% hla_genes) %>%
+        group_by(locus) %>%
+        summarize_at(vars(tpm, est_counts), sum) %>%
+        ungroup()
+}
+
+read_kallisto_imgt_quants <- function(f) {
+
+    read_tsv(f, col_types = "c--dd", progress = FALSE) %>%
+        filter(grepl("^IMGT_", Name)) %>%
+        mutate(locus = imgt_to_gname(Name), gene_id = gname_to_gid(locus)) %>%
+        select(locus, gene_id, allele = target_id, est_counts, tpm)
+}
+
+read_kallisto_pri_quants <- function(f) {
+
+    read_tsv(f, col_types = "c--dd", progress = FALSE) %>%
+        left_join(gencode_pri_tx, by = c("Name" = "tx_id")) %>%
+        select(tx_id = Name, locus = gene_name,
+               est_counts, tpm) %>%
+        filter(locus %in% hla_genes) %>%
+        group_by(locus) %>%
+        summarize_at(vars(tpm, est_counts), sum) %>%
+        ungroup()
+}
