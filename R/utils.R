@@ -152,17 +152,17 @@ read_star_pri_quants <- function(f) {
 read_kallisto_imgt_quants <- function(f) {
 
     read_tsv(f, col_types = "c--dd", progress = FALSE) %>%
-        filter(grepl("^IMGT_", Name)) %>%
-        mutate(locus = imgt_to_gname(Name), gene_id = gname_to_gid(locus)) %>%
+        filter(grepl("^IMGT_", target_id)) %>%
+        mutate(locus = imgt_to_gname(target_id), 
+	       gene_id = gname_to_gid(locus)) %>%
         select(locus, gene_id, allele = target_id, est_counts, tpm)
 }
 
 read_kallisto_pri_quants <- function(f) {
 
     read_tsv(f, col_types = "c--dd", progress = FALSE) %>%
-        left_join(gencode_pri_tx, by = c("Name" = "tx_id")) %>%
-        select(tx_id = Name, locus = gene_name,
-               est_counts, tpm) %>%
+        left_join(gencode_pri_tx, by = c("target_id" = "tx_id")) %>%
+        select(tx_id = target_id, locus = gene_name, est_counts, tpm) %>%
         filter(locus %in% hla_genes) %>%
         group_by(locus) %>%
         summarize_at(vars(tpm, est_counts), sum) %>%
