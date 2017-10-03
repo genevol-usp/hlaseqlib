@@ -131,7 +131,7 @@ hla_format_sequence <- function(cds) {
 
 read_star_imgt_quants <- function(f) {
 
-    readr::read_tsv(f, progress = FALSE) %>%
+    readr::read_tsv(f, col_types = "cdd", progress = FALSE) %>%
         dplyr::filter(grepl("^IMGT_", Name)) %>%
         dplyr::mutate(locus = imgt_to_gname(Name), 
 		      gene_id = gname_to_gid(locus)) %>%
@@ -141,7 +141,7 @@ read_star_imgt_quants <- function(f) {
 
 read_star_pri_quants <- function(f) {
 
-    readr::read_tsv(f, progress = FALSE) %>%
+    readr::read_tsv(f, col_types = "cdd", progress = FALSE) %>%
         dplyr::left_join(gencode_pri_tx, by = c("Name" = "tx_id")) %>%
         dplyr::select(tx_id = Name, locus = gene_name,
 		      est_counts = NumReads, tpm = TPM) %>%
@@ -153,7 +153,7 @@ read_star_pri_quants <- function(f) {
 
 read_kallisto_imgt_quants <- function(f) {
 
-    readr::read_tsv(f, progress = FALSE) %>%
+    readr::read_tsv(f, col_types = "cdd", progress = FALSE) %>%
         dplyr::filter(grepl("^IMGT_", target_id)) %>%
         dplyr::mutate(locus = imgt_to_gname(target_id), 
 		      gene_id = gname_to_gid(locus)) %>%
@@ -162,7 +162,7 @@ read_kallisto_imgt_quants <- function(f) {
 
 read_kallisto_pri_quants <- function(f) {
 
-    readr::read_tsv(f, progress = FALSE) %>%
+    readr::read_tsv(f, col_types = "cdd", progress = FALSE) %>%
         dplyr::left_join(gencode_pri_tx, by = c("target_id" = "tx_id")) %>%
         dplyr::select(tx_id = target_id, locus = gene_name, est_counts, tpm) %>%
         dplyr::filter(locus %in% hla_genes) %>%

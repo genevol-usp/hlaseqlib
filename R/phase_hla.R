@@ -18,7 +18,7 @@ phase_hla <- function(x) {
       dplyr::mutate(i = seq_len(n())) %>%
       tidyr::unite(allele_diff, allele, diffs) %>%
       tidyr::spread(locus, allele_diff) %>%
-      tidyr::expand(hap, A, B, C, DQA1, DQB1, DRB1) %>%
+      tidyr::expand(hap, A, B, C, DPB1, DQA1, DQB1, DRB1) %>%
       purrr::by_row(. %>% dplyr::select(A:DRB1) %>% sub("^.+_(\\d+)$", "\\1", .) %>% as.integer %>% sum,
 		    .to = "S", .collate = "cols") %>%
       dplyr::mutate_at(dplyr::vars(A:DRB1), . %>% sub("_\\d+$", "", .))
