@@ -4,13 +4,10 @@
 \alias{read_qtltools_rtc}
 \title{Read in QTLtools rtc output}
 \usage{
-read_qtltools_rtc(rtc_output, col_names = TRUE)
+read_qtltools_rtc(rtc_output)
 }
 \arguments{
 \item{rtc_output}{character string. Path to file.}
-
-\item{col_names.}{Whether the rtc output has col names. Normal run does, when
-a genomic region is selected, it does not.}
 }
 \value{
 data.frame
