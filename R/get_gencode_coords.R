@@ -1,12 +1,13 @@
 #' Parse Gencode gtf files into a data.frame of ids and coordinates.
 #'
 #' @param gtf character string. Path to gtf file.
-#' @param feature character string. Either 'gene' or 'transcript'.
+#' @param feature character string.
 #'
 #' @return data.frame
 #' @export
 
-get_gencode_coords <- function(gtf, feature = c("gene", "transcript", "exon")) {
+get_gencode_coords <- function(gtf, feature = c("gene", "transcript", "exon",
+						"start_codon")) {
   
   feature <- match.arg(feature)
 
@@ -30,5 +31,13 @@ get_gencode_coords <- function(gtf, feature = c("gene", "transcript", "exon")) {
 			    start, end, strand)
   } else if (feature == "exon") {
     annot %>% dplyr::select(-i)
+  } else if (feature == "start_codon") {
+      annot %>% 
+	  dplyr::select(-i) %>%
+	  dplyr::distinct(start, end, gene_id, .keep_all = TRUE) %>%
+	  dplyr::group_by(gene_id) %>%
+	  dplyr::filter((strand == "+" & start == min(start)) | 
+			(strand == "-" & end == max(end))) %>%
+	  dplyr::ungroup()
   }
 }

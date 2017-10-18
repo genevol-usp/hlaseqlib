@@ -4,12 +4,13 @@
 \alias{get_gencode_coords}
 \title{Parse Gencode gtf files into a data.frame of ids and coordinates.}
 \usage{
-get_gencode_coords(gtf, feature = c("gene", "transcript", "exon"))
+get_gencode_coords(gtf, feature = c("gene", "transcript", "exon",
+  "start_codon"))
 }
 \arguments{
 \item{gtf}{character string. Path to gtf file.}
 
-\item{feature}{character string. Either 'gene' or 'transcript'.}
+\item{feature}{character string.}
 }
 \value{
 data.frame
