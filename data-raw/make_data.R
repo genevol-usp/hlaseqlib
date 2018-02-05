@@ -84,14 +84,7 @@ gencode_all_tx <-
 
 hla_genes <- paste0("HLA-", c("A", "B", "C", "DPB1", "DQA1", "DQB1", "DRB1"))
 
-start_codon <- "~/gencode_data/gencode.v25.annotation.gtf.gz" %>%
-    get_gencode_coords(feature = "start_codon") %>%
-    filter(gene_name %in% hla_genes) %>%
-    mutate(tss = ifelse(strand == "+", start, end)) %>%
-    select(gene_id, gene_name, tss)
-
-gencode_hla <- filter(gencode_chr_gene, gene_name %in% hla_genes) %>%
-    left_join(start_codon, by = c("gene_id", "gene_name"))
+gencode_hla <- filter(gencode_chr_gene, gene_name %in% hla_genes)
 
 gencode_hla_v19 <- 
     "~/gencode_data/gencode.v19.annotation.gtf.gz" %>%
