@@ -2,14 +2,14 @@
 #'
 #' @param gen_file character string. Path to IMGT alignment file.
 #' @param omit_suffix character string. String of optional suffixes indicating
-#' expression status. Possible values are NULL (default, keep all allele names
-#' with suffixes) or a string of suffixes to omit (e.g., "NQL"). 
+#' expression status. Possible values are NULL (keep all allele names with
+#' suffixes) or a string of suffixes to omit (e.g., "NQL"). Default is "N".
 #'
 #' @return A data.frame.
 #'
 #' @export
 
-hla_read_utr <- function(gen_file, omit_suffix = NULL) {
+hla_read_utr <- function(gen_file, omit_suffix = "N") {
   
     locus <- sub("_gen\\.txt", "", basename(gen_file))
 
@@ -27,15 +27,16 @@ hla_read_utr <- function(gen_file, omit_suffix = NULL) {
 			 cds = paste(cds, collapse = "")) %>%
 	dplyr::arrange(rowname) %>%
 	dplyr::select(-rowname)
-
-    hla_df$cds <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
-	apply(2, function(i) {i[i == "-"] <- i[1]; i}) %>%
-	apply(1, . %>% paste(collapse = ""))
- 
+    
     if (!is.null(omit_suffix)) {
 	suffix <- sprintf("[^%s]$", omit_suffix)
 	hla_df <- dplyr::filter(hla_df, grepl(suffix, allele))
     }
+
+    hla_df$cds <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
+	.[, apply(., 2, function(x) !all(x == "." | x == "*"))] %>%
+	apply(2, function(i) {i[i == "-"] <- i[1]; i}) %>%
+	apply(1, . %>% paste(collapse = ""))
 
     utr_df <- hla_df %>%
 	dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
@@ -47,8 +48,8 @@ hla_read_utr <- function(gen_file, omit_suffix = NULL) {
 	dplyr::select(allele, exon, cds) %>%
 	tidyr::spread(exon, cds) %>%
 	setNames(c("allele", "utr5", "utr3")) %>%
-	dplyr::mutate(utr5 = substring(utr5, nchar(utr5)-74L, nchar(utr5)),
-		      utr3 = substring(utr3, 1, 75))
+	dplyr::mutate(utr5 = substring(utr5, nchar(utr5)-99L, nchar(utr5)),
+		      utr3 = substring(utr3, 1, 100))
 
     utr_df
 }
