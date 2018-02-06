@@ -11,7 +11,12 @@
 
 hla_minres <- function(allele_vec) {
 
-  lapply(1:4, function(i) hla_trimnames(allele_vec, i) %>% unique()) %>%
-  purrr::keep(~length(.x) == 1) %>%
-  dplyr::last()
+    out <- 
+	lapply(1:4, function(i) hla_trimnames(allele_vec, i) %>% unique()) %>%
+	purrr::keep(~length(.x) == 1) %>%
+	dplyr::last()
+
+    if (is.null(out)) return(NA)
+
+    out
 }
