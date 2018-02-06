@@ -46,8 +46,8 @@ hla_read_utr <- function(gen_file, omit_suffix = NULL) {
 	dplyr::ungroup() %>%
 	dplyr::select(allele, exon, cds) %>%
 	tidyr::spread(exon, cds) %>%
-	setNames(c("allele", "utr3", "utr5")) %>%
-	dplyr::mutate(utr5 = substring(utr5, nchar(utr5)-75L, nchar(utr5)),
+	setNames(c("allele", "utr5", "utr3")) %>%
+	dplyr::mutate(utr5 = substring(utr5, nchar(utr5)-74L, nchar(utr5)),
 		      utr3 = substring(utr3, 1, 75))
 
     utr_df
