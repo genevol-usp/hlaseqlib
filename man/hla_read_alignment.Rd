@@ -5,7 +5,7 @@
 \title{Process HLA alignment data in *.nuc files and return a data.frame.}
 \usage{
 hla_read_alignment(nuc_file, exons = NULL, by_exon = FALSE,
-  omit_suffix = NULL, rm_incomplete = FALSE, keep_sep = FALSE)
+  omit_suffix = "N", rm_incomplete = FALSE, keep_sep = FALSE)
 }
 \arguments{
 \item{nuc_file}{character string. Path to IMGT alignment file.}
@@ -15,8 +15,8 @@ hla_read_alignment(nuc_file, exons = NULL, by_exon = FALSE,
 \item{by_exon}{logical. Whether to return data separated by exons.}
 
 \item{omit_suffix}{character string. String of optional suffixes indicating
-expression status. Possible values are NULL (default, keep all allele names
-with suffixes) or a string of suffixes to omit (e.g., "NQL").}
+expression status. Possible values are NULL (keep all allele names with
+suffixes) or a string of suffixes to omit (e.g., "NQL"). Default is "N".}
 
 \item{rm_incomplete}{logical. Whether to remove incomplete cdss.}
 
