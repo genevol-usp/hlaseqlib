@@ -1,4 +1,4 @@
-#' Process HLA alignment data in *.nuc files and return a data.frame.
+#' Process HLA alignment data in *.gen files and return a data.frame.
 #'
 #' @param gen_file character string. Path to IMGT alignment file.
 #' @param omit_suffix character string. String of optional suffixes indicating

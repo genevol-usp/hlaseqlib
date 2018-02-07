@@ -2,7 +2,7 @@
 % Please edit documentation in R/hla_read_utr.R
 \name{hla_read_utr}
 \alias{hla_read_utr}
-\title{Process HLA alignment data in *.nuc files and return a data.frame.}
+\title{Process HLA alignment data in *.gen files and return a data.frame.}
 \usage{
 hla_read_utr(gen_file, omit_suffix = "N")
 }
@@ -17,5 +17,5 @@ suffixes) or a string of suffixes to omit (e.g., "NQL"). Default is "N".}
 A data.frame.
 }
 \description{
-Process HLA alignment data in *.nuc files and return a data.frame.
+Process HLA alignment data in *.gen files and return a data.frame.
 }

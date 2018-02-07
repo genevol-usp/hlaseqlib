@@ -170,3 +170,71 @@ read_kallisto_pri_quants <- function(f) {
         dplyr::summarize_at(vars(tpm, est_counts), sum) %>%
         dplyr::ungroup()
 }
+
+make_dist_matrix <- function(hla_df) {
+
+    complete_alleles <- hla_df$allele[!grepl("\\*", hla_df$cds)]
+    incomplete_alleles <- hla_df$allele[grepl("\\*", hla_df$cds)]
+
+    cds_sequenced <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
+	apply(2, function(x) !any(x == "*"))
+
+    run <- rle(cds_sequenced)
+
+    ends <- cumsum(run$lengths)
+    starts <- ends - run$lengths + 1L
+
+    run_df <- 
+	tibble::tibble(value = run$values, 
+		       start = starts, 
+		       end = ends) %>%
+	dplyr::filter(value == TRUE) %>%
+	dplyr::mutate(l = purrr::map2_int(start, end, ~length(.x:.y))) %>%
+	dplyr::filter(l == max(l))
+
+    hla_df_cds_common <- hla_df %>%
+	dplyr::mutate(cds = substring(cds, run_df$start, run_df$end))
+
+    hla_df_cds_common_complete <- hla_df_cds_common %>%
+	dplyr::filter(allele %in% complete_alleles)
+
+    hla_df_cds_common_incomplete <- hla_df_cds_common %>%
+	dplyr::filter(allele %in% incomplete_alleles)
+
+    cds_common_complete <- hla_df_cds_common_complete$cds
+    names(cds_common_complete) <- hla_df_cds_common_complete$allele
+    
+    cds_common_incomplete <- hla_df_cds_common_incomplete$cds
+    names(cds_common_incomplete) <- hla_df_cds_common_incomplete$allele
+
+    stringdist::stringdistmatrix(cds_common_incomplete, cds_common_complete,
+				 method = "hamming", useNames = "names")
+}
+    
+make_closest_allele_df <- function(distmatrix) {
+
+    cnames <- colnames(distmatrix)
+    
+    distmatrix %>%
+	split(seq_len(nrow(distmatrix))) %>%
+	setNames(rownames(distmatrix)) %>%
+	lapply(function(x) which(x == min(x, na.rm = TRUE))) %>% 
+	purrr::map(~tibble::tibble(closest = cnames[.])) %>%
+	dplyr::bind_rows(.id = "inc_allele")
+}
+
+find_closest_within_type <- function(closest_df) {
+
+    closest_df %>% 
+    dplyr::mutate(`1` = hla_trimnames(inc_allele, 1) == hla_trimnames(closest, 1),
+		  `2` = hla_trimnames(inc_allele, 2) == hla_trimnames(closest, 2),
+		  `3` = hla_trimnames(inc_allele, 3) == hla_trimnames(closest, 3),
+		  `4` = hla_trimnames(inc_allele, 4) == hla_trimnames(closest, 4)) %>%
+    tidyr::gather(field, value, `1`:`4`) %>%
+    dplyr::group_by(inc_allele) %>%
+    dplyr::filter(all(value == FALSE) | value == TRUE) %>%
+    dplyr::slice(which.max(field)) %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(inc_allele) %>%
+    dplyr::select(inc_allele, closest)
+}
