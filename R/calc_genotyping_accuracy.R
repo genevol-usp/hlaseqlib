@@ -50,11 +50,11 @@ calc_genotyping_accuracy <- function(data_x, data_y, by_locus = TRUE) {
 	dplyr::distinct(subject, locus,  allele.y, .keep_all = TRUE) %>%
 	dplyr::distinct(subject, locus, h.x, .keep_all = TRUE)
 
-    w_samet <-
-	dplyr::anti_join(wrong, w_same2, by = c("subject", "locus", "h.y")) %>%
-	dplyr::filter(supertype.x == supertype.y) %>%
+    w_samet <- wrong %>%
+	dplyr::filter(twofield.x != twofield.y, supertype.x == supertype.y) %>%
 	dplyr::distinct(subject, locus,  allele.y, .keep_all = TRUE) %>%
-	dplyr::distinct(subject, locus, h.x, .keep_all = TRUE)
+	dplyr::distinct(subject, locus, h.x, .keep_all = TRUE) %>%
+	dplyr::anti_join(w_same2, by = c("subject", "locus", "allele.x"))
 
     w_same <- dplyr::bind_rows(w_same2, w_samet)
 
@@ -68,7 +68,8 @@ calc_genotyping_accuracy <- function(data_x, data_y, by_locus = TRUE) {
 	dplyr::summarize(allele.x = paste(unique(allele.x), collapse = "/"),
 			 allele.y = paste(unique(allele.y), collapse = "/"),
 			 correct = unique(correct)) %>%
-	dplyr::select(subject, locus, allele.x, allele.y, correct)
+	dplyr::select(subject, locus, allele.x, allele.y, correct) %>%
+	tidyr::separate_rows(allele.x, sep = "/")
 
     if (by_locus) {
 	df_final %>%
