@@ -1,4 +1,4 @@
-#' Phase HLA alleles given distances to 1000G haplotypes
+#' Pfase HLA alleles given distances to 1000G haplotypes
 #'
 #' @param x data.frame. A data.frame with distances of alleles to each 1000G
 #' haplotype.
@@ -8,76 +8,48 @@
 #'
 #' @export
 
+
 phase_hla <- function(x) {
 
-  x <- dplyr::mutate(x, locus = sub("^HLA-", "", locus))
+    x <- dplyr::mutate(x, locus = sub("^HLA-", "", locus))
 
-  combinations <- 
-    x %>%
-      dplyr::group_by(locus, hap) %>%
-      dplyr::mutate(i = seq_len(n())) %>%
-      tidyr::unite(allele_diff, allele, diffs) %>%
-      tidyr::spread(locus, allele_diff) %>%
-      tidyr::expand(hap, A, B, C, DPB1, DQA1, DQB1, DRB1) %>%
-      purrr::by_row(. %>% dplyr::select(A:DRB1) %>% sub("^.+_(\\d+)$", "\\1", .) %>% as.integer %>% sum,
-		    .to = "S", .collate = "cols") %>%
-      dplyr::mutate_at(dplyr::vars(A:DRB1), . %>% sub("_\\d+$", "", .))
+    combs <- x %>%
+	dplyr::group_by(locus) %>%
+	dplyr::mutate(i = seq_len(n())) %>%
+	dplyr::select(-diffs) %>%
+	tidyr::spread(locus, allele) %>%
+	dplyr::select(-subject, -i) %>%
+	tidyr::expand(hap, A, B, C, DPB1, DQA1, DQB1, DRB1) %>%
+	tidyr::drop_na()
 
-  h1s <- dplyr::filter(combinations, hap == "a1") %>% dplyr::mutate(i = "A")
-  h2s <- dplyr::filter(combinations, hap == "a2") %>% dplyr::mutate(i = "A")
+    combs_1 <- combs %>%
+	dplyr::filter(hap == 1) %>%
+	dplyr::mutate(unique_hap_id = seq_len(n()))
 
-  test.x <- dplyr::left_join(h1s, h2s, by = "i") %>% 
-    dplyr::select(-i) %>%
-    dplyr::mutate(r = 1:n())
+    combs_2 <- combs %>%
+	dplyr::filter(hap == 2) %>%
+	dplyr::mutate(unique_hap_id = rep(list(combs_1$unique_hap_id), nrow(.))) %>%
+	tidyr::unnest()
 
-  test.y <- test.x %>%
-    dplyr::select(-S.x, -S.y) %>%
-    tidyr::gather(locus, allele, -hap.x, -hap.y, -r) %>%
-    dplyr::arrange(r, hap.x, hap.y, locus) %>%
-    dplyr::group_by(r) %>%
-    dplyr::filter(all(x$allele %in% allele)) %>%
-    dplyr::ungroup()
+    min_hap <- 
+        dplyr::left_join(combs_1, combs_2, by = "unique_hap_id", suffix = c(".1", ".2")) %>%
+	dplyr::select(-hap.1, -hap.2, -unique_hap_id) %>%
+	dplyr::mutate(geno_id = seq_len(n())) %>%
+	tidyr::gather(locus, allele, -geno_id) %>%
+	dplyr::group_by(geno_id) %>%
+	dplyr::filter(all(unique(x$allele) %in% allele)) %>%
+	tidyr::separate(locus, c("locus", "hap"), sep = "\\.", convert = TRUE) %>%
+	dplyr::left_join(x, by = c("locus", "hap", "allele")) %>%
+	dplyr::group_by(geno_id) %>%
+	dplyr::mutate(total_diff = sum(diffs)) %>%
+	dplyr::ungroup() %>%
+	dplyr::filter(total_diff == min(total_diff)) %>%
+	dplyr::group_by(hap, locus) %>%
+	dplyr::summarise(allele = paste(unique(allele), collapse = "/")) %>%
+	dplyr::ungroup() %>%
+	dplyr::select(locus, hap, allele) %>%
+	dplyr::arrange(locus, hap) %>%
+	dplyr::mutate(locus = paste0("HLA-", locus))
 
-  test.z <- dplyr::filter(test.x, r %in% test.y$r) %>%
-    dplyr::select(-r) %>%
-    dplyr::mutate(S = S.x + S.y) %>%
-    dplyr::filter(S == min(S))
-
-  out.x <- dplyr::select(test.z, dplyr::ends_with(".x")) %>%
-    setNames(sub("\\.x", "", names(.)))
-  out.y <- dplyr::select(test.z, dplyr::ends_with(".y")) %>%
-    setNames(sub("\\.y", "", names(.)))
-
-  out <- dplyr::bind_rows(out.x, out.y) %>%
-    dplyr::arrange(hap)
-
-  if (nrow(out) == 2L && all(c("a1", "a2") %in% out$hap)) {
-    return(out)
-  }
-
-  min.hap <- dplyr::filter(out, S == min(S))
-
-  hom <- 
-    dplyr::select(out, -hap, -S) %>%
-    sapply(function(a) length(unique(a)) == 1) %>%
-    which() %>%
-    names()
-
-  not_amb <- 
-    dplyr::select(min.hap, -hap, -S) %>%
-    sapply(function(a) length(unique(a)) == 1) %>%
-    which() %>%
-    names()
-
-  not_amb <- not_amb[! not_amb %in% hom]
-
-  df_not_amb <- dplyr::anti_join(out, min.hap, by = "hap")
-
-  for (i in seq_along(not_amb)) {
-    df_not_amb <- dplyr::anti_join(df_not_amb, min.hap, by = not_amb[i])
-  }
-
-  dplyr::bind_rows(min.hap, df_not_amb) %>%
-    dplyr::group_by(hap) %>%
-    dplyr::summarize_all(. %>% unique %>% paste(collapse = "/")) 
+    min_hap
 }
