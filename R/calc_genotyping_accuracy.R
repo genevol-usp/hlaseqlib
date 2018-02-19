@@ -68,13 +68,15 @@ calc_genotyping_accuracy <- function(data_x, data_y, by_locus = TRUE) {
 	dplyr::summarize(allele.x = paste(unique(allele.x), collapse = "/"),
 			 allele.y = paste(unique(allele.y), collapse = "/"),
 			 correct = unique(correct)) %>%
+	dplyr::ungroup() %>%
 	dplyr::select(subject, locus, allele.x, allele.y, correct) %>%
 	tidyr::separate_rows(allele.x, sep = "/")
 
     if (by_locus) {
 	df_final %>%
 	    dplyr::group_by(locus) %>%
-	    dplyr::summarize(accuracy = mean(correct))
+	    dplyr::summarize(accuracy = mean(correct)) %>%
+	    dplyr::ungroup()
     } else {
 	df_final
     }
