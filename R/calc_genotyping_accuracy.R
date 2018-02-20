@@ -19,8 +19,9 @@ calc_genotyping_accuracy <- function(data_x, data_y, by_locus = TRUE) {
 	dplyr::ungroup() %>%
 	tidyr::separate_rows(allele, sep = "/") %>%
 	tidyr::separate_rows(allele, sep = "=") %>%
-	dplyr::mutate(supertype = sub("^([^:]+).+$", "\\1", allele),
-		      twofield = sub("^([^:]+:[^:]+).*$", "\\1", allele))
+	dplyr::mutate(supertype = hla_trimnames(allele, 1),
+		      twofield = hla_trimnames(allele, 2),
+		      threefield = hla_trimnames(allele, 3))
     }
 
     common <- 
@@ -34,7 +35,11 @@ calc_genotyping_accuracy <- function(data_x, data_y, by_locus = TRUE) {
 
     x <-
 	dplyr::inner_join(data_x, data_y, by = c("subject", "locus")) %>%
-	dplyr::mutate(correct = (allele.x == allele.y | twofield.x == allele.y | supertype.x == allele.y))
+	dplyr::mutate(correct = allele.x == allele.y |
+				allele.x == threefield.y |
+				threefield.x == allele.y |
+				twofield.x == allele.y | 
+				supertype.x == allele.y)
 
     right <- 
 	dplyr::filter(x, correct) %>%
