@@ -41,10 +41,11 @@ calc_genotyping_accuracy <- function(data_x, data_y, by_locus = TRUE) {
 				twofield.x == allele.y | 
 				supertype.x == allele.y)
 
-    right <- 
-	dplyr::filter(x, correct) %>%
-	dplyr::distinct(subject, locus, h.y, .keep_all = TRUE) %>%
-	dplyr::distinct(subject, locus, h.x, .keep_all = TRUE)
+    right <- dplyr::filter(x, correct) %>%
+	dplyr::distinct(subject, locus, h.x, h.y, .keep_all = TRUE) %>%
+	dplyr::group_by(subject, locus, allele.x) %>%
+	dplyr::filter(n() == 1 | (n() > 1 & h.x == h.y)) %>%
+	dplyr::ungroup()
 
     wrong <-
 	dplyr::anti_join(x, right, by = c("subject", "locus", "h.y")) %>%
