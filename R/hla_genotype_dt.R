@@ -11,16 +11,16 @@ hla_genotype_dt <- function(hla_quants, th = 0.05) {
 
   data.table::setDT(hla_quants)
   
-  hla_quants[, r := data.table::frank(-tpm, ties.method = "dense"), by = .(subject, locus)]
+  hla_quants[, r := data.table::frank(-est_counts, ties.method = "dense"), by = .(subject, locus)]
 
   top2 <- 
     hla_quants[r == 1 | r == 2
-	     ][, maxtpm := max(tpm), by = .(subject, locus)
-	     ][maxtpm == 0 | (tpm/maxtpm > th)]
+	     ][, maxcounts := max(est_counts), by = .(subject, locus)
+	     ][maxcounts == 0 | (est_counts/maxcounts > th)]
   
   out <- 
-    top2[, .(allele = paste(allele, collapse = "="), est_counts = mean(est_counts)), 
-         by = .(subject, gene_id, locus, tpm)
+    top2[, .(allele = paste(allele, collapse = "="), tpm = mean(tpm)), 
+         by = .(subject, gene_id, locus, est_counts)
        ][, n := .N, by = .(subject, gene_id, locus)
        ][n == 1, `:=`(est_counts = est_counts/2L, tpm = tpm/2L)
        ][, i := ifelse(n == 1, "1_1", "1")
