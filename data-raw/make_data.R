@@ -74,7 +74,12 @@ gencode_pri_tx <-
   "~/gencode_data/gencode.v25.primary_assembly.annotation.gtf.gz" %>%
   get_gencode_coords(feature = "transcript")
 
-hla_genes <- paste0("HLA-", c("A", "B", "C", "DPB1", "DQA1", "DQB1", "DRB1"))
+gencode_all_gene <- 
+    "~/gencode_data/gencode.v25.chr_patch_hapl_scaff.annotation.gtf.gz" %>%
+    get_gencode_coords(feature = "gene")
+
+hla_genes <- 
+    paste0("HLA-", c("A", "B", "C", "DPA1", "DPB1", "DQA1", "DQB1", "DRA", "DRB1"))
 
 gencode_hla <- filter(gencode_chr_gene, gene_name %in% hla_genes) %>%
     select(-gene_type)
@@ -99,11 +104,11 @@ hla_groups <-
   select(locus, group, allele) %>%
   arrange(locus, group, allele)
   
-pag <- hla_readmhc("~/hla_tools/1kg/data/mhc.tab") 
+pag <- hla_readmhc("./mhc.tab") 
 
 pag_groups <- alleles_to_groups(pag) 
 
-devtools::use_data(geuvadis_info, gencode_chr_gene, gencode_chr_tx,
+devtools::use_data(geuvadis_info, gencode_chr_gene, gencode_chr_tx, gencode_all_gene,
 		   gencode_pri_gene, gencode_pri_tx, gencode_hla, 
 		   gencode_hla_v19, gencode_hla_v12, pag, overwrite = TRUE)
 
