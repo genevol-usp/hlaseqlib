@@ -20,13 +20,13 @@ hla_genotype_dt <- function(hla_quants, th = 0.05) {
   
   out <- 
     top2[, .(allele = paste(allele, collapse = "="), tpm = mean(tpm)), 
-         by = .(subject, gene_id, locus, est_counts)
-       ][, n := .N, by = .(subject, gene_id, locus)
+         by = .(subject, locus, est_counts)
+       ][, n := .N, by = .(subject, locus)
        ][n == 1, `:=`(est_counts = est_counts/2L, tpm = tpm/2L)
        ][, i := ifelse(n == 1, "1_1", "1")
        ][, .(i = unlist(strsplit(i, "_"))), 
-         by = .(subject, gene_id, locus, allele, tpm, est_counts)
-       ][, .(subject, gene_id, locus, allele, est_counts, tpm)
+         by = .(subject, locus, allele, tpm, est_counts)
+       ][, .(subject, locus, allele, est_counts, tpm)
        ][order(subject, locus, allele)]
 
   out
