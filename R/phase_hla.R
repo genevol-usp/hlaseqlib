@@ -13,13 +13,15 @@ phase_hla <- function(x) {
 
     x <- dplyr::mutate(x, locus = sub("^HLA-", "", locus))
 
+    loci <- dplyr::syms(unique(x$locus))
+
     combs <- x %>%
 	dplyr::group_by(locus) %>%
 	dplyr::mutate(i = seq_len(n())) %>%
 	dplyr::select(-diffs) %>%
 	tidyr::spread(locus, allele) %>%
 	dplyr::select(-subject, -i) %>%
-	tidyr::expand(hap, A, B, C, DPB1, DQA1, DQB1, DRB1) %>%
+	tidyr::expand(hap, !!! loci) %>%
 	tidyr::drop_na()
 
     combs_1 <- combs %>%
