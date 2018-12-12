@@ -6,8 +6,7 @@
 #' @return data.frame
 #' @export
 
-get_gencode_coords <- function(gtf, feature = c("gene", "transcript", "exon",
-						"start_codon")) {
+get_gencode_coords <- function(gtf, feature = c("gene", "transcript", "exon")) {
   
   feature <- match.arg(feature)
 
@@ -31,13 +30,5 @@ get_gencode_coords <- function(gtf, feature = c("gene", "transcript", "exon",
 			    start, end, strand)
   } else if (feature == "exon") {
     annot %>% dplyr::select(-i)
-  } else if (feature == "start_codon") {
-      annot %>% 
-	  dplyr::select(-i) %>%
-	  dplyr::distinct(start, end, gene_id, .keep_all = TRUE) %>%
-	  dplyr::group_by(gene_id) %>%
-	  dplyr::filter((strand == "+" & start == min(start)) | 
-			(strand == "-" & end == max(end))) %>%
-	  dplyr::ungroup()
-  }
+  } 
 }

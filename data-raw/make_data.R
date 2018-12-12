@@ -87,12 +87,14 @@ gencode_hla <- filter(gencode_chr_gene, gene_name %in% hla_genes) %>%
 gencode_hla_v19 <- 
     "~/gencode_data/gencode.v19.annotation.gtf.gz" %>%
     get_gencode_coords(feature = "gene") %>%
-    filter(gene_name %in% hla_genes)
+    filter(gene_name %in% hla_genes) %>%
+    select(-gene_type)
 
 gencode_hla_v12 <- 
     "~/gencode_data/gencode.v12.annotation.gtf.gz" %>%
     get_gencode_coords(feature = "gene") %>%
-    filter(gene_name %in% hla_genes)
+    filter(gene_name %in% hla_genes) %>%
+    select(-gene_type)
 
 hla_groups <-
     "~/IMGTHLA/wmda/hla_nom_g.txt" %>%
