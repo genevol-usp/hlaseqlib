@@ -2,7 +2,7 @@
 % Please edit documentation in R/phase_hla.R
 \name{phase_hla}
 \alias{phase_hla}
-\title{Phase HLA alleles given distances to 1000G haplotypes}
+\title{Pfase HLA alleles given distances to 1000G haplotypes}
 \usage{
 phase_hla(x)
 }
@@ -15,5 +15,5 @@ A data.frame with 2 rows with inferred haplotypes for each
 individual.
 }
 \description{
-Phase HLA alleles given distances to 1000G haplotypes
+Pfase HLA alleles given distances to 1000G haplotypes
 }

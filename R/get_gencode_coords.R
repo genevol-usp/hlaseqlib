@@ -17,18 +17,23 @@ get_gencode_coords <- function(gtf, feature = c("gene", "transcript", "exon")) {
     dplyr::select(chr = X1, start = X4, end = X5, strand = X7, X9) %>%
     dplyr::mutate(i = seq_len(nrow(.)), X9 = stringr::str_split(X9, "; ")) %>%
     tidyr::unnest() %>%
-    dplyr::filter(stringr::str_detect(X9, "^gene_name|^gene_id|^gene_type|^transcript_id")) %>%
+    dplyr::filter(grepl("^gene_name|^gene_id|^gene_type|^transcript_id|^transcript_type", X9)) %>%
     tidyr::separate(X9, c("tag", "id"), " ") %>%
-    dplyr::mutate(chr = stringr::str_replace(chr, "^chr", ""),
-		  id = stringr::str_replace_all(id, "\"", "")) %>%
+    dplyr::mutate(chr = sub("^chr", "", chr),
+		  id = gsub("\"", "", id)) %>%
     tidyr::spread(tag, id)
 
   if (feature == "gene") {
-    annot %>% dplyr::select(chr, gene_id, gene_name, gene_type, start, end, strand)
+    annot %>% 
+	dplyr::select(chr, gene_id, gene_name, gene_type, start, end, strand)
   } else if (feature == "transcript") {
-    annot %>% dplyr::select(chr, tx_id = transcript_id, gene_id, gene_name, 
-			    start, end, strand)
+    annot %>% 
+	dplyr::select(chr, gene_id, gene_name, tx_id = transcript_id, 
+		      tx_type = transcript_type, start, end, strand)
   } else if (feature == "exon") {
-    annot %>% dplyr::select(-i)
-  } 
+    annot %>% 
+	dplyr::select(chr, gene_id, gene_name, tx_id = transcript_id, 
+		      tx_type = transcript_type, start, end, strand)
+
+  }
 }

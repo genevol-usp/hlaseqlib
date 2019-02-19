@@ -4,11 +4,11 @@
 \alias{hla_read_alignment}
 \title{Process HLA alignment data in *.nuc files and return a data.frame.}
 \usage{
-hla_read_alignment(nuc_file, exons = NULL, by_exon = FALSE,
+hla_read_alignment(align_file, exons = NULL, by_exon = FALSE,
   omit_suffix = "N", rm_incomplete = FALSE, keep_sep = FALSE)
 }
 \arguments{
-\item{nuc_file}{character string. Path to IMGT alignment file.}
+\item{align_file}{character string. Path to IMGT alignment file.}
 
 \item{exons}{integer. Range of vectors to select (default = all exons).}
 

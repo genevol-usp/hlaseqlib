@@ -173,8 +173,13 @@ read_kallisto_pri_quants <- function(f) {
 
 make_dist_matrix <- function(hla_df) {
 
-    complete_alleles <- hla_df$allele[!grepl("\\*", hla_df$cds)]
-    incomplete_alleles <- hla_df$allele[grepl("\\*", hla_df$cds)]
+    complete_alleles <- hla_df %>% 
+	dplyr::filter(!grepl("\\*", cds)) %>%
+	dplyr::pull(allele)
+
+    incomplete_alleles <- hla_df %>% 
+	dplyr::filter(grepl("\\*", cds)) %>%
+	dplyr::pull(allele)
 
     cds_sequenced <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
 	apply(2, function(x) !any(x == "*"))
@@ -189,8 +194,7 @@ make_dist_matrix <- function(hla_df) {
 		       start = starts, 
 		       end = ends) %>%
 	dplyr::filter(value == TRUE) %>%
-	dplyr::mutate(l = purrr::map2_int(start, end, ~length(.x:.y))) %>%
-	dplyr::filter(l == max(l))
+	dplyr::slice(which.max(end - start + 1))
 
     hla_df_cds_common <- hla_df %>%
 	dplyr::mutate(cds = substring(cds, run_df$start, run_df$end))
@@ -208,18 +212,17 @@ make_dist_matrix <- function(hla_df) {
     names(cds_common_incomplete) <- hla_df_cds_common_incomplete$allele
 
     stringdist::stringdistmatrix(cds_common_incomplete, cds_common_complete,
-				 method = "hamming", useNames = "names")
+				 method = "hamming", useNames = "names", 
+				 nthread = 1)
 }
     
 make_closest_allele_df <- function(distmatrix) {
 
-    cnames <- colnames(distmatrix)
-    
     distmatrix %>%
 	split(seq_len(nrow(distmatrix))) %>%
 	setNames(rownames(distmatrix)) %>%
 	lapply(function(x) which(x == min(x, na.rm = TRUE))) %>% 
-	purrr::map(~tibble::tibble(closest = cnames[.])) %>%
+	purrr::map(~tibble::tibble(closest = colnames(distmatrix)[.])) %>%
 	dplyr::bind_rows(.id = "inc_allele")
 }
 
