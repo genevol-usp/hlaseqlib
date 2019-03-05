@@ -7,8 +7,7 @@
 hla_infer(hla_df, cores = 1)
 }
 \arguments{
-\item{hla_df}{data.frame. A data.frame such as the one returned by 
-\code{hla_dataframe}.}
+\item{hla_df}{data.frame. A data.frame..}
 
 \item{cores}{integer. Number of cores.}
 }

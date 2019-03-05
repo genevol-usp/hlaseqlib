@@ -1,7 +1,6 @@
 #' Infer sequences missing on the IMGT alignments.
 #'
-#' @param hla_df data.frame. A data.frame such as the one returned by 
-#' \code{hla_dataframe}.
+#' @param hla_df data.frame. A data.frame..
 #' @param cores integer. Number of cores.
 #'
 #' @return A data.frame with the original sequences of the complete alleles
