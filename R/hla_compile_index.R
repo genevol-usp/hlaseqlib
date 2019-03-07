@@ -20,7 +20,7 @@ hla_compile_index <- function(locus, imgt.database) {
     alignments <- readLines(nuc_file) %>%
 	gsub("\\s{2,}", " ", .) %>%
 	trimws %>%
-	.[grepl(sprintf("^%s\\d?\\*\\d{2,3}[:A-Z0-9]*\\s", locus), .)]
+	.[grepl(sprintf("^%s\\d?\\*\\d{2,3}[:A-Z0-9]*\\s", locus_nuc), .)]
 
     hla_df <-
 	tibble::tibble(allele = gsub("^(\\S+)\\s(.*)$", "\\1", alignments),
@@ -33,14 +33,16 @@ hla_compile_index <- function(locus, imgt.database) {
 	dplyr::select(-rowname)
   
     hla_df$cds <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
-	.[, apply(., 2, function(x) !all(x %in% c(".", "*", "|")))] %>%
 	apply(2, function(i) {i[i == "-"] <- i[1]; i}) %>%
-	apply(1, . %>% paste(collapse = ""))
-
+	apply(1, . %>% paste(collapse = "")) 
+    
     hla_df <- hla_df %>%
-	dplyr::mutate(gene = sub("^([^*]+).+$", "\\1", allele)) %>%
-	dplyr::filter(gene == locus) %>%
-	dplyr::select(-gene)
+	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus)
+	
+    hla_df$cds <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
+	.[, apply(., 2, function(x) !all(x %in% c(".", "*", "|")))] %>%
+	apply(1, . %>% paste(collapse = "")) 
+
 
     if (all(grepl("\\*", hla_df$cds))) {
 	
