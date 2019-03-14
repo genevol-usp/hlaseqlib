@@ -1,14 +1,14 @@
 tr_to_gid <- function(tr) 
-    gencode_all_tx$gene_id[match(tr, gencode_all_tx$tx_id)]
+    gencode_pri_tx$gene_id[match(tr, gencode_pri_tx$tx_id)]
 
 tr_to_gname <- function(tr)
-    gencode_all_tx$gene_name[match(tr, gencode_all_tx$tx_id)]
+    gencode_pri_tx$gene_name[match(tr, gencode_pri_tx$tx_id)]
 
 gname_to_gid <- function(gname)
-    gencode_all_tx$gene_id[match(gname, gencode_all_tx$gene_name)]
+    gencode_pri_tx$gene_id[match(gname, gencode_pri_tx$gene_name)]
 
 gid_to_gname <- function(gid)
-    gencode_all_tx$gene_name[match(gid, gencode_all_tx$gene_id)]
+    gencode_pri_tx$gene_name[match(gid, gencode_pri_tx$gene_id)]
 
 convert_ena_ids <- function(ena_id)
     geuvadis_info$name[match(ena_id, geuvadis_info$ena_id)]
