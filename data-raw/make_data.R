@@ -110,9 +110,12 @@ pag <- hla_readmhc("./mhc.tab")
 
 pag_groups <- alleles_to_groups(pag) 
 
-usethis::use_data(geuvadis_info, gencode_chr_gene, gencode_chr_tx, gencode_all_gene,
-		   gencode_pri_gene, gencode_pri_tx, gencode_hla, 
-		   gencode_hla_v19, gencode_hla_v12, pag, overwrite = TRUE)
+polypheme_pag <- read_tsv("./polypheme_plus_pag_calls.tsv")
+
+usethis::use_data(geuvadis_info, gencode_chr_gene, gencode_chr_tx, 
+		  gencode_all_gene, gencode_pri_gene, gencode_pri_tx, 
+		  gencode_hla, gencode_hla_v19, gencode_hla_v12, pag, 
+		  polypheme_pag, overwrite = TRUE)
 
 devtools::use_data(allele_hist, hla_groups, pag_groups,
                    internal = TRUE, overwrite = TRUE)
