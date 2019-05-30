@@ -4,12 +4,14 @@
 \alias{hla_compile_index}
 \title{Process HLA alignment data in *.nuc files and return a data.frame.}
 \usage{
-hla_compile_index(locus, imgt.database)
+hla_compile_index(locus, imgt.database, short = FALSE)
 }
 \arguments{
 \item{locus}{character string.}
 
 \item{imgt.database}{character string.}
+
+\item{short}{logical. Whether to create shorter version of index.}
 }
 \value{
 A data.frame.

@@ -1,6 +1,7 @@
 #' Process HLA alignment data in *.nuc files and return a data.frame.
 #'
-#' @param align_file character string. Path to IMGT alignment file.
+#' @param locus character string.
+#' @param imgtdb character strings.
 #' @param exons integer. Range of vectors to select (default = all exons).
 #' @param by_exon logical. Whether to return data separated by exons.
 #' @param omit_suffix character string. String of optional suffixes indicating
@@ -8,20 +9,23 @@
 #' suffixes) or a string of suffixes to omit (e.g., "NQL"). Default is "N".
 #' @param rm_incomplete logical. Whether to remove incomplete cdss.
 #' @param keep_sep logical. Whether to keep the exon separator character "|" in
-#' the cdss.
+#' the cds.
 #'
 #' @return A data.frame.
 #'
 #' @export
 
-hla_read_alignment <- function(align_file, exons = NULL, by_exon = FALSE, 
+hla_read_alignment <- function(locus, imgtdb, exons = NULL, by_exon = FALSE, 
 			       omit_suffix = "N", rm_incomplete = FALSE, 
 			       keep_sep = FALSE) {
-  
-    locus <- sub("^(.+)_[a-z]{3}\\.txt$", "\\1", basename(align_file))
+ 
+    message(paste("Processing locus", locus))
+
+    locus_nuc <- ifelse(grepl("DRB\\d", locus), "DRB", locus) 
     
-    nuc <-
-	readLines(align_file) %>%
+    nuc_file <- file.path(imgtdb, "alignments", paste0(locus_nuc, "_nuc.txt"))
+
+    alignments <- readLines(nuc_file) %>%
 	gsub("\\s{2,}", " ", .) %>%
 	trimws %>%
 	.[grepl(sprintf("^%s\\d?\\*\\d{2,3}[:A-Z0-9]*\\s", locus), .)]

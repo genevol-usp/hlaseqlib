@@ -4,11 +4,13 @@
 \alias{hla_read_alignment}
 \title{Process HLA alignment data in *.nuc files and return a data.frame.}
 \usage{
-hla_read_alignment(align_file, exons = NULL, by_exon = FALSE,
+hla_read_alignment(locus, imgtdb, exons = NULL, by_exon = FALSE,
   omit_suffix = "N", rm_incomplete = FALSE, keep_sep = FALSE)
 }
 \arguments{
-\item{align_file}{character string. Path to IMGT alignment file.}
+\item{locus}{character string.}
+
+\item{imgtdb}{character strings.}
 
 \item{exons}{integer. Range of vectors to select (default = all exons).}
 
@@ -21,7 +23,7 @@ suffixes) or a string of suffixes to omit (e.g., "NQL"). Default is "N".}
 \item{rm_incomplete}{logical. Whether to remove incomplete cdss.}
 
 \item{keep_sep}{logical. Whether to keep the exon separator character "|" in
-the cdss.}
+the cds.}
 }
 \value{
 A data.frame.
