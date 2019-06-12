@@ -33,15 +33,15 @@ hla_compile_index <- function(locus, imgt.database, short = FALSE) {
 	dplyr::arrange(rowid) %>%
 	dplyr::select(-rowid)
     
-    hla_df <- hla_df %>%
-	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus)
-  
     hla_df$cds <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
 	apply(2, function(i) {i[i == "-"] <- i[1]; i}) %>%
 	apply(1, . %>% paste(collapse = "")) 
+    
+    hla_df <- hla_df %>%
+	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus)
 	
     hla_df$cds <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
-	.[, apply(., 2, function(x) !all(x %in% c(".", "*")))] %>%
+	.[, apply(., 2, function(x) !all(x %in% c(".", "*"))), drop = FALSE] %>%
 	apply(1, . %>% paste(collapse = "")) 
 
     if (all(grepl("\\*", hla_df$cds))) {
