@@ -1,6 +1,6 @@
 Package: hlaseqlib
 Title: R utility functions for the HLA RNAseq project
-Version: 0.0.0.9016
+Version: 0.0.0.9017
 Authors@R: person("Vitor", "Aguiar", , "vitor@ib.usp.br", c("aut", "cre"))
 Description: Utils package for the HLA RNAseq project
 Depends:
