@@ -11,6 +11,7 @@
 #' @examples
 #' hla_trimnames(c("A*01:01:01:01", "A*02:01:01:01"), fields = 2)
 #' @export
+
 hla_trimnames <- function(alleles_vec, fields = 3) {
 
   regex <- sprintf("^([A-Z]{1,3}\\d?\\*)((:?\\d{2,3}[NQLS]?){%d}).*$", fields)

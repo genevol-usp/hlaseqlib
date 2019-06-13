@@ -15,7 +15,7 @@ calc_genotyping_accuracy <- function(data_x, data_y, by_locus = TRUE) {
 	dplyr::inner_join(df, common, by = c("subject", "locus")) %>%
 	dplyr::arrange(subject, locus, allele) %>%
 	dplyr::group_by(subject, locus) %>%
-	dplyr::mutate(h = 1:n()) %>%
+	dplyr::mutate(h = 1:dplyr::n()) %>%
 	dplyr::ungroup() %>%
 	tidyr::separate_rows(allele, sep = "/") %>%
 	tidyr::separate_rows(allele, sep = "=") %>%
