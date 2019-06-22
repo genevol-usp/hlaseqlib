@@ -13,36 +13,7 @@ hla_compile_index <- function(locus, imgt.database, short = FALSE) {
     message(paste("Processing locus", locus)) 
 
     # Process alignments
-    locus_nuc <- ifelse(grepl("DRB\\d", locus), "DRB", locus)
-
-    nuc_file <- 
-	file.path(imgt.database, "alignments", paste0(locus_nuc, "_nuc.txt"))
-    
-    alignments <- readLines(nuc_file) %>%
-	gsub("\\s{2,}", " ", .) %>%
-	trimws %>%
-	.[grepl(sprintf("^%s\\d?\\*\\d{2,3}[:A-Z0-9]*\\s", locus_nuc), .)]
-
-    hla_df <-
-	tibble::tibble(allele = gsub("^(\\S+)\\s(.*)$", "\\1", alignments),
-		       cds = gsub("\\s", "", gsub("^(\\S+)\\s(.*)$", "\\2", alignments))) %>%
-	tibble::rowid_to_column() %>% 
-	dplyr::group_by(allele) %>%
-	dplyr::summarize(rowid = min(rowid), 
-			 cds = paste(cds, collapse = "")) %>%
-	dplyr::arrange(rowid) %>%
-	dplyr::select(-rowid)
-    
-    hla_df$cds <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
-	apply(2, function(i) {i[i == "-"] <- i[1]; i}) %>%
-	apply(1, . %>% paste(collapse = "")) 
-    
-    hla_df <- hla_df %>%
-	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus)
-	
-    hla_df$cds <- stringr::str_split(hla_df$cds, "", simplify = TRUE) %>%
-	.[, apply(., 2, function(x) !all(x %in% c(".", "*"))), drop = FALSE] %>%
-	apply(1, . %>% paste(collapse = "")) 
+    hla_df <- hla_read_alignment(locus, imgt.database)
 
     if (all(grepl("\\*", hla_df$cds))) {
 	
@@ -96,21 +67,6 @@ hla_compile_index <- function(locus, imgt.database, short = FALSE) {
 	    dplyr::filter(!grepl("\\*", cds)) %>%
 	    dplyr::bind_rows(inferred_df) %>%
 	    dplyr::arrange(allele)
-    }
-
-    if (short) {
-    
-	final_df <- final_df %>%
-	    tidyr::separate_rows(cds, sep = "\\|") %>%
-	    dplyr::group_by(allele) %>%
-	    dplyr::mutate(exon = seq_len(dplyr::n())) %>%
-	    dplyr::filter(exon %in% 1:4) %>%
-	    dplyr::mutate(cds = hla_format_sequence(cds)) %>%
-	    dplyr::mutate(cds = dplyr::case_when(exon == 1 & nchar(cds) > 50 ~ substring(cds, nchar(cds)-50+1 , nchar(cds)),
-						 exon == 4 & nchar(cds) > 50 ~ substring(cds, 1, 50),
-						 TRUE ~ cds)) %>%
-	    dplyr::summarise(cds = paste(cds, collapse = "")) %>%
-	    dplyr::ungroup()
     }
 
     final_df %>%
