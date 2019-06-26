@@ -4,7 +4,7 @@
 \alias{hla_read_alignment}
 \title{Process HLA alignment data in *.nuc files and return a data.frame.}
 \usage{
-hla_read_alignment(locus, imgtdb, exons = NULL)
+hla_read_alignment(locus, imgtdb, exons = NULL, by_exon = FALSE)
 }
 \arguments{
 \item{locus}{character string. The HLA locus to be processed (e.g., "A", "DRB1").}
@@ -12,6 +12,8 @@ hla_read_alignment(locus, imgtdb, exons = NULL)
 \item{imgtdb}{character string. Path to the IMGTHLA directory.}
 
 \item{exons}{integer. Range of exons (default is all exons).}
+
+\item{by_exon}{logical. Whether to return sequences separated for each exon (default FALSE).}
 }
 \value{
 A data.frame.
