@@ -2,24 +2,29 @@
 % Please edit documentation in R/hla_read_alignment.R
 \name{hla_read_alignment}
 \alias{hla_read_alignment}
-\title{Process HLA alignment data in *.nuc files and return a data.frame.}
+\title{Process HLA alignment data in *.nuc or *.gen files and return a data.frame.}
 \usage{
-hla_read_alignment(locus, imgtdb, exons = NULL, by_exon = FALSE)
+hla_read_alignment(locus, imgtdb, imgtfile = c("nuc", "gen"),
+  exons = NULL, by_exon = FALSE, keep_sep = FALSE)
 }
 \arguments{
 \item{locus}{character string. The HLA locus to be processed (e.g., "A", "DRB1").}
 
 \item{imgtdb}{character string. Path to the IMGTHLA directory.}
 
-\item{exons}{integer. Range of exons (default is all exons).}
+\item{imgtfile}{character string. Whether to process "nuc" or "gen" files.}
 
-\item{by_exon}{logical. Whether to return sequences separated for each exon (default FALSE).}
+\item{exons}{integer. Range of exons/introns (default is all exons/introns).}
+
+\item{by_exon}{logical. Whether to return sequences separated for each exon/intron (default FALSE).}
+
+\item{keep_sep}{logical. Whether to keep '|' as the separator between exons/introns.}
 }
 \value{
 A data.frame.
 }
 \description{
-Process HLA alignment data in *.nuc files and return a data.frame.
+Process HLA alignment data in *.nuc or *.gen files and return a data.frame.
 }
 \examples{
 \dontrun{

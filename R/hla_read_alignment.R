@@ -1,9 +1,11 @@
-#' Process HLA alignment data in *.nuc files and return a data.frame.
+#' Process HLA alignment data in *.nuc or *.gen files and return a data.frame.
 #'
 #' @param locus character string. The HLA locus to be processed (e.g., "A", "DRB1").
 #' @param imgtdb character string. Path to the IMGTHLA directory.
-#' @param exons integer. Range of exons (default is all exons).
-#' @param by_exon logical. Whether to return sequences separated for each exon (default FALSE).
+#' @param imgtfile character string. Whether to process "nuc" or "gen" files. 
+#' @param exons integer. Range of exons/introns (default is all exons/introns).
+#' @param by_exon logical. Whether to return sequences separated for each exon/intron (default FALSE).
+#' @param keep_sep logical. Whether to keep '|' as the separator between exons/introns.
 #'
 #' @return A data.frame.
 #'
@@ -17,13 +19,24 @@
 #'
 #' @export
 
-hla_read_alignment <- function(locus, imgtdb, exons = NULL, by_exon = FALSE) {
+hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
+			       exons = NULL, by_exon = FALSE, keep_sep = FALSE) {
  
-    locus_nuc <- ifelse(grepl("DRB\\d", locus), "DRB", locus) 
-    
-    nuc_file <- file.path(imgtdb, "alignments", paste0(locus_nuc, "_nuc.txt"))
+    imgtfile <- match.arg(imgtfile)
 
-    alignments <- readLines(nuc_file) %>%
+    if (imgtfile == "nuc") {
+
+	locus_file <- ifelse(grepl("DRB\\d", locus), "DRB", locus)
+	alig_file <- file.path(imgtdb, "alignments", paste0(locus_file, "_nuc.txt"))
+
+    } else if (imgtfile == "gen") {
+
+	locus_file <- locus
+	alig_file <- file.path(imgtdb, "alignments", paste0(locus_file, "_gen.txt"))
+
+    }
+
+    alignments <- readLines(alig_file) %>%
 	gsub("\\s{2,}", " ", .) %>%
 	trimws %>%
 	.[grepl(sprintf("^%s\\d?\\*\\d{2,3}[:A-Z0-9]*\\s", locus), .)]
@@ -44,24 +57,9 @@ hla_read_alignment <- function(locus, imgtdb, exons = NULL, by_exon = FALSE) {
 	
     hla_df <- hla_df %>%
 	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus)
-
-    if (is.null(exons) && !by_exon) {
-
-	hla_df <- hla_df %>% 
-	    dplyr::mutate(cds = gsub("\\|", "", cds))
     
-    } else if (is.null(exons) && by_exon) {
+    if (!is.null(exons) && is.numeric(exons)) {
 
-	hla_df <- hla_df %>%
-	    dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
-	    tidyr::unnest() %>%
-	    dplyr::group_by(allele) %>%
-	    dplyr::mutate(exon = seq_len(dplyr::n())) %>%
-	    dplyr::select(allele, exon, cds) %>% 
-	    dplyr::ungroup()
-    
-    } else if (!is.null(exons) && is.numeric(exons) && !by_exon) {
-    
 	hla_df <- hla_df %>%
 	    dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
 	    tidyr::unnest() %>%
@@ -69,19 +67,32 @@ hla_read_alignment <- function(locus, imgtdb, exons = NULL, by_exon = FALSE) {
 	    dplyr::mutate(exon = seq_len(dplyr::n())) %>%
 	    dplyr::select(allele, exon, cds) %>% 
 	    dplyr::filter(exon %in% exons) %>%
-	    dplyr::summarise(cds = paste(cds, collapse = "")) %>%
+	    dplyr::summarise(cds = paste(cds, collapse = "|")) %>%
 	    dplyr::ungroup()
+    }
     
-    } else if (!is.null(exons) && is.numeric(exons) && by_exon) {
-	
+    if (by_exon) {
+
 	hla_df <- hla_df %>%
 	    dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
 	    tidyr::unnest() %>%
 	    dplyr::group_by(allele) %>%
 	    dplyr::mutate(exon = seq_len(dplyr::n())) %>%
-	    dplyr::ungroup() %>%
 	    dplyr::select(allele, exon, cds) %>% 
-	    dplyr::filter(exon %in% exons)
+	    dplyr::ungroup()
+
+	if (imgtfile == "gen") {
+	
+	    hla_df <- hla_df %>%
+		mutate(feature = ifelse(exon %% 2 == 0, "exon", "intron")) %>%
+		select(allele, feature, index = exon, cds)
+	}
+    }
+
+    if (!keep_sep) {
+
+	hla_df <- hla_df %>% 
+	    dplyr::mutate(cds = gsub("\\|", "", cds))
     }
    
     hla_df
