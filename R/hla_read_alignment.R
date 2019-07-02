@@ -67,19 +67,12 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
 	    dplyr::mutate(exon = seq_len(dplyr::n())) %>%
 	    dplyr::select(allele, exon, cds) %>% 
 	    dplyr::filter(exon %in% exons) %>%
-	    dplyr::summarise(cds = paste(cds, collapse = "|")) %>%
 	    dplyr::ungroup()
     }
-    
+   
     if (by_exon) {
 
-	hla_df <- hla_df %>%
-	    dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
-	    tidyr::unnest() %>%
-	    dplyr::group_by(allele) %>%
-	    dplyr::mutate(exon = seq_len(dplyr::n())) %>%
-	    dplyr::select(allele, exon, cds) %>% 
-	    dplyr::ungroup()
+	hla_df <- hla_df
 
 	if (imgtfile == "gen") {
 	
@@ -87,6 +80,13 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
 		mutate(feature = ifelse(exon %% 2 == 0, "exon", "intron")) %>%
 		select(allele, feature, index = exon, cds)
 	}
+    
+    } else if (!by_exon) {
+	
+	hla_df <- hla_df %>%
+	    group_by(allele) %>%
+	    dplyr::summarise(cds = paste(cds, collapse = "|")) %>%
+	    dplyr::ungroup()
     }
 
     if (!keep_sep) {
