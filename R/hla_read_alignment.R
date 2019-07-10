@@ -68,27 +68,23 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
 	    dplyr::select(allele, exon, cds) %>% 
 	    dplyr::filter(exon %in% exons) %>%
 	    dplyr::ungroup()
-    }
-   
-    if (by_exon) {
-
-	hla_df <- hla_df
-
+	
+	if (!by_exon) {
+	    
+	    hla_df <- hla_df %>%
+		group_by(allele) %>%
+		dplyr::summarise(cds = paste(cds, collapse = "|")) %>%
+		dplyr::ungroup()
+	}
+    
 	if (imgtfile == "gen") {
 	
 	    hla_df <- hla_df %>%
 		mutate(feature = ifelse(exon %% 2 == 0, "exon", "intron")) %>%
 		select(allele, feature, index = exon, cds)
 	}
-    
-    } else if (!by_exon) {
-	
-	hla_df <- hla_df %>%
-	    group_by(allele) %>%
-	    dplyr::summarise(cds = paste(cds, collapse = "|")) %>%
-	    dplyr::ungroup()
     }
-
+   
     if (!keep_sep) {
 
 	hla_df <- hla_df %>% 
