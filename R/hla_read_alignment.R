@@ -78,7 +78,7 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
 	    dplyr::ungroup()
     }
     
-    if (imgtfile == "gen") {
+    if (imgtfile == "gen" && !is.null(exons) && is.numeric(exons)) {
     
 	hla_df <- hla_df %>%
 	    mutate(feature = ifelse(exon %% 2 == 0, "exon", "intron")) %>%
