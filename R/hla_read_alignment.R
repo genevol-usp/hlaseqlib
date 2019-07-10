@@ -56,33 +56,33 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
 	apply(1, . %>% paste(collapse = ""))
 	
     hla_df <- hla_df %>%
-	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus)
+	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus) %>%
+	dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
+	tidyr::unnest() %>%
+	dplyr::group_by(allele) %>%
+	dplyr::mutate(exon = seq_len(dplyr::n())) %>%
+	dplyr::select(allele, exon, cds) %>% 
+	dplyr::ungroup()
     
     if (!is.null(exons) && is.numeric(exons)) {
 
 	hla_df <- hla_df %>%
-	    dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
-	    tidyr::unnest() %>%
-	    dplyr::group_by(allele) %>%
-	    dplyr::mutate(exon = seq_len(dplyr::n())) %>%
-	    dplyr::select(allele, exon, cds) %>% 
-	    dplyr::filter(exon %in% exons) %>%
+	    dplyr::filter(exon %in% exons)
+    }
+
+    if (!by_exon) {
+	
+	hla_df <- hla_df %>%
+	    group_by(allele) %>%
+	    dplyr::summarise(cds = paste(cds, collapse = "|")) %>%
 	    dplyr::ungroup()
-	
-	if (!by_exon) {
-	    
-	    hla_df <- hla_df %>%
-		group_by(allele) %>%
-		dplyr::summarise(cds = paste(cds, collapse = "|")) %>%
-		dplyr::ungroup()
-	}
+    }
     
-	if (imgtfile == "gen") {
-	
-	    hla_df <- hla_df %>%
-		mutate(feature = ifelse(exon %% 2 == 0, "exon", "intron")) %>%
-		select(allele, feature, index = exon, cds)
-	}
+    if (imgtfile == "gen") {
+    
+	hla_df <- hla_df %>%
+	    mutate(feature = ifelse(exon %% 2 == 0, "exon", "intron")) %>%
+	    select(allele, feature, index = exon, cds)
     }
    
     if (!keep_sep) {
