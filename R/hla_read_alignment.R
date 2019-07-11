@@ -56,36 +56,48 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
 	apply(1, . %>% paste(collapse = ""))
 	
     hla_df <- hla_df %>%
-	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus) %>%
-	dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
-	tidyr::unnest() %>%
-	dplyr::group_by(allele) %>%
-	dplyr::mutate(exon = seq_len(dplyr::n())) %>%
-	dplyr::select(allele, exon, cds) %>% 
-	dplyr::ungroup()
-    
-    if (!is.null(exons) && is.numeric(exons)) {
+	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus) 
+
+
+    if (by_exon || (!is.null(exons) && is.numeric(exons))) {
 
 	hla_df <- hla_df %>%
-	    dplyr::filter(exon %in% exons)
-    }
-
-    if (!by_exon) {
-	
-	hla_df <- hla_df %>%
-	    group_by(allele) %>%
-	    dplyr::summarise(cds = paste(cds, collapse = "|")) %>%
+	    dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
+	    tidyr::unnest() %>%
+	    dplyr::group_by(allele) %>%
+	    dplyr::mutate(exon = seq_len(dplyr::n())) %>%
+	    dplyr::select(allele, exon, cds) %>% 
 	    dplyr::ungroup()
+    
+	if (!is.null(exons) && is.numeric(exons)) {
+
+	    hla_df <- hla_df %>%
+		dplyr::filter(exon %in% exons)
+	}
+
+	if (imgtfile == "gen") {
+	
+	    hla_df <- hla_df %>%
+		dplyr::rename(idx = exon) %>%
+		dplyr::mutate(feature = ifelse(idx %% 2 == 0, "exon", "intron"),
+			      feature = dplyr::case_when(feature == "intron" & idx == 1 ~ "UTR",
+							 feature == "intron" & idx == last(idx) ~ "UTR",
+							 TRUE ~ feature)) %>%
+		dplyr::group_by(allele, feature) %>%
+		dplyr::mutate(idx_grp = seq_len(dplyr::n())) %>% 
+		dplyr::ungroup() %>%
+		dplyr::select(allele, feature, idx, idx_grp, cds)
+
+	} else if (imgtfile == "nuc") {
+
+	    hla_df <- hla_df %>%
+		gather(feature, idx, exon) %>%
+		mutate(idx_grp = idx) %>%
+		select(allele, feature, idx, idx_grp, cds)
+	}
     }
     
-    if (imgtfile == "gen" && !is.null(exons) && is.numeric(exons)) {
-    
-	hla_df <- hla_df %>%
-	    mutate(feature = ifelse(exon %% 2 == 0, "exon", "intron")) %>%
-	    select(allele, feature, index = exon, cds)
-    }
-   
-    if (!keep_sep) {
+    if (!by_exon && !keep_sep) {
 
 	hla_df <- hla_df %>% 
 	    dplyr::mutate(cds = gsub("\\|", "", cds))
