@@ -39,7 +39,7 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
     alignments <- readLines(alig_file) %>%
 	gsub("\\s{2,}", " ", .) %>%
 	trimws %>%
-	.[grepl(sprintf("^%s\\d?\\*\\d{2,3}[:A-Z0-9]*\\s", locus), .)]
+	.[grepl(sprintf("^%s\\d?\\*\\d{2,3}[:A-Z0-9]*\\s", locus_file), .)]
 
     hla_df <-
 	tibble::tibble(allele = gsub("^(\\S+)\\s(.*)$", "\\1", alignments),
@@ -57,7 +57,6 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
 	
     hla_df <- hla_df %>%
 	dplyr::filter(sub("^([^\\*]+).+$", "\\1", allele) == locus) 
-
 
     if (by_exon || (!is.null(exons) && is.numeric(exons))) {
 
