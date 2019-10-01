@@ -1,6 +1,6 @@
 Package: hlaseqlib
 Title: R utility functions for the HLA RNAseq project
-Version: 0.0.0.9024
+Version: 0.0.0.9025
 Authors@R: person("Vitor", "Aguiar", , "vitor@ib.usp.br", c("aut", "cre"))
 Description: Utils package for the HLA RNAseq project
 Depends:
@@ -12,7 +12,7 @@ Imports:
     stringdist (>= 0.9.5.1),
     stringr (>= 1.4.0),
     tibble (>= 2.1.1),
-    tidyr (>= 0.8.1)
+    tidyr (>= 1.0.0)
 Suggests: 
 License: MIT + file LICENSE
 LazyData: yes

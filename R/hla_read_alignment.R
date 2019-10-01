@@ -62,7 +62,7 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
 
 	hla_df <- hla_df %>%
 	    dplyr::mutate(cds = strsplit(cds, "\\|")) %>%
-	    tidyr::unnest() %>%
+	    tidyr::unnest(cds) %>%
 	    dplyr::group_by(allele) %>%
 	    dplyr::mutate(exon = seq_len(dplyr::n())) %>%
 	    dplyr::select(allele, exon, cds) %>% 
