@@ -2,13 +2,12 @@
 #'
 #' @param locus character string.
 #' @param imgt.database character string.
-#' @param short logical. Whether to create shorter version of index.
 #'
 #' @return A data.frame.
 #'
 #' @export
 
-hla_compile_index <- function(locus, imgt.database, short = FALSE) {
+hla_compile_index <- function(locus, imgt.database) {
 
     message(paste("Processing locus", locus)) 
 
@@ -30,13 +29,11 @@ hla_compile_index <- function(locus, imgt.database, short = FALSE) {
 	# find closest complete allele for each incomplete allele
 	distmatrix <- make_dist_matrix(hla_df) 
 
-        closest_allele_df <- make_closest_allele_df(distmatrix)
+        closest_allele_df <- make_closest_allele_df(distmatrix) %>%
+	    dplyr::mutate(id = dplyr::group_indices(., inc_allele))
 
-	closest_allele_df$id <- closest_allele_df %>% 
-	    dplyr::group_indices(inc_allele)
-
-	closest_allele_df_step2 <-
-	    tidyr::gather(closest_allele_df, ix, allele, 1:2) %>%
+	closest_allele_df_step2 <- closest_allele_df %>% 
+	    tidyr::gather(ix, allele, 1:2) %>%
 	    dplyr::distinct(id, allele) %>%
 	    dplyr::left_join(hla_df, by = "allele") %>%
 	    split(.$id) %>%

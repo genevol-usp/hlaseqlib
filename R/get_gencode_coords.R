@@ -16,7 +16,7 @@ get_gencode_coords <- function(gtf, feature = c("gene", "transcript", "exon")) {
     dplyr::filter(X3 == feature) %>%
     dplyr::select(chr = X1, start = X4, end = X5, strand = X7, X9) %>%
     dplyr::mutate(i = seq_len(nrow(.)), X9 = stringr::str_split(X9, "; ")) %>%
-    tidyr::unnest(X9) %>%
+    tidyr::unnest(cols = c(X9)) %>%
     dplyr::filter(grepl("^gene_name|^gene_id|^gene_type|^transcript_id|^transcript_type", X9)) %>%
     tidyr::separate(X9, c("tag", "id"), " ") %>%
     dplyr::mutate(chr = sub("^chr", "", chr),
