@@ -58,50 +58,35 @@ geuvadis_info <-
     distinct() %>%
     mutate(kgp_phase3 = as.integer(name %in% samples_phase3$subject)) 
 
-gencode_chr_gene <-
-    "~/gencode_data/gencode.v25.annotation.gtf.gz" %>%
-    get_gencode_coords(feature = "gene")
 
-gencode_chr_tx <-
-    "~/gencode_data/gencode.v25.annotation.gtf.gz" %>%
-    get_gencode_coords(feature = "transcript")
+gencode_chr_gene <-
+    "~/gencode_data/v32/gencode.v32.annotation.gtf" %>%
+    get_gencode_coords(feature = "gene")
 
 gencode_pri_gene <-
-    "~/gencode_data/gencode.v25.primary_assembly.annotation.gtf.gz" %>%
-    get_gencode_coords(feature = "gene")
-
-gencode_pri_tx <-
-    "~/gencode_data/gencode.v25.primary_assembly.annotation.gtf.gz" %>%
-    get_gencode_coords(feature = "transcript")
-
-gencode_all_gene <- 
-    "~/gencode_data/gencode.v25.chr_patch_hapl_scaff.annotation.gtf.gz" %>%
-    get_gencode_coords(feature = "gene")
-
-gencode_priv32_gene <-
     "~/gencode_data/v32/gencode.v32.primary_assembly.annotation.gtf.gz" %>%
     get_gencode_coords(feature = "gene")
 
-gencode_allv32_gene <-
+gencode_all_gene <-
     "~/gencode_data/v32/gencode.v32.chr_patch_hapl_scaff.annotation.gtf.gz" %>%
     get_gencode_coords(feature = "gene")
+
+gencode_chr_tx <-
+    "~/gencode_data/v32/gencode.v32.annotation.gtf" %>%
+    get_gencode_coords(feature = "transcript")
+
+gencode_pri_tx <-
+    "~/gencode_data/v32/gencode.v32.primary_assembly.annotation.gtf.gz" %>%
+    get_gencode_coords(feature = "transcript")
+
+gencode_all_tx <-
+    "~/gencode_data/v32/gencode.v32.chr_patch_hapl_scaff.annotation.gtf.gz" %>%
+    get_gencode_coords(feature = "transcript")
 
 hla_genes <- 
     paste0("HLA-", c("A", "B", "C", "DPA1", "DPB1", "DQA1", "DQB1", "DRA", "DRB1"))
 
 gencode_hla <- filter(gencode_chr_gene, gene_name %in% hla_genes) %>%
-    select(-gene_type)
-
-gencode_hla_v19 <- 
-    "~/gencode_data/gencode.v19.annotation.gtf.gz" %>%
-    get_gencode_coords(feature = "gene") %>%
-    filter(gene_name %in% hla_genes) %>%
-    select(-gene_type)
-
-gencode_hla_v12 <- 
-    "~/gencode_data/gencode.v12.annotation.gtf.gz" %>%
-    get_gencode_coords(feature = "gene") %>%
-    filter(gene_name %in% hla_genes) %>%
     select(-gene_type)
 
 hla_groups <-
@@ -120,10 +105,11 @@ pag_groups <- alleles_to_groups(pag)
 
 polypheme_pag <- read_tsv("./polypheme_plus_pag_calls.tsv")
 
-usethis::use_data(geuvadis_info, gencode_chr_gene, gencode_chr_tx, 
-		  gencode_all_gene, gencode_pri_gene, gencode_pri_tx, 
-		  gencode_priv32_gene, gencode_allv32_gene,
-		  gencode_hla, gencode_hla_v19, gencode_hla_v12, pag, 
-		  polypheme_pag, overwrite = TRUE)
+usethis::use_data(geuvadis_info, 
+		  gencode_chr_gene, gencode_chr_tx, 
+		  gencode_pri_gene, gencode_pri_tx, 
+		  gencode_all_gene, gencode_all_tx, 
+		  gencode_hla, pag, polypheme_pag, 
+		  overwrite = TRUE)
 
 usethis::use_data(allele_hist, hla_groups, pag_groups, internal = TRUE, overwrite = TRUE)
