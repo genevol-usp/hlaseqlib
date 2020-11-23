@@ -68,32 +68,30 @@ hla_read_alignment <- function(locus, imgtdb, imgtfile = c("nuc", "gen"),
 	    dplyr::select(allele, exon, cds) %>% 
 	    dplyr::ungroup()
     
-	if (!is.null(exons) && is.numeric(exons)) {
-
-	    hla_df <- hla_df %>%
-		dplyr::filter(exon %in% exons)
-	}
-
 	if (imgtfile == "gen") {
-	
 	    hla_df <- hla_df %>%
 		dplyr::rename(idx = exon) %>%
 		dplyr::mutate(feature = ifelse(idx %% 2 == 0, "exon", "intron"),
 			      feature = dplyr::case_when(feature == "intron" & idx == 1 ~ "UTR",
-							 feature == "intron" & idx == last(idx) ~ "UTR",
+							 feature == "intron" & idx == dplyr::last(idx) ~ "UTR",
 							 TRUE ~ feature)) %>%
 		dplyr::group_by(allele, feature) %>%
 		dplyr::mutate(idx_grp = seq_len(dplyr::n())) %>% 
 		dplyr::ungroup() %>%
 		dplyr::select(allele, feature, idx, idx_grp, cds)
-
 	} else if (imgtfile == "nuc") {
+	    hla_df <- hla_df %>%
+		dplyr::mutate(feature = "exon", idx = exon, idx_grp = exon) %>%
+		dplyr::select(allele, feature, idx, idx_grp, cds)
+	}
+
+	if (!is.null(exons) && is.numeric(exons)) {
 
 	    hla_df <- hla_df %>%
-		gather(feature, idx, exon) %>%
-		mutate(idx_grp = idx) %>%
-		select(allele, feature, idx, idx_grp, cds)
+		dplyr::filter(feature == "exon", idx_grp %in% exons)
 	}
+
+
     }
     
     if (!by_exon && !keep_sep) {
