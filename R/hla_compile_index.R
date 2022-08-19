@@ -30,7 +30,7 @@ hla_compile_index <- function(locus, imgt.database) {
 	distmatrix <- make_dist_matrix(hla_df) 
 
         closest_allele_df <- make_closest_allele_df(distmatrix) %>%
-	    dplyr::mutate(id = dplyr::group_indices(., inc_allele))
+	    dplyr::mutate(id = as.integer(factor(inc_allele)))
 
 	closest_allele_df_step2 <- closest_allele_df %>% 
 	    tidyr::gather(ix, allele, 1:2) %>%
